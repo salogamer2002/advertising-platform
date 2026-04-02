@@ -10,6 +10,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy (required for Vercel)
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet());
 app.use(cors());
@@ -33,6 +36,24 @@ app.use((req, res, next) => {
 });
 
 /**
+ * @route GET /
+ * @description Root endpoint with service information
+ */
+app.get('/', (req, res) => {
+  res.json({
+    service: 'AI Content Microservice',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      generateCopy: 'POST /generate/copy',
+      generateSocial: 'POST /generate/social',
+      generateHashtags: 'POST /generate/hashtags',
+      streamCopy: 'POST /generate/copy/stream',
+    }
+  });
+});
+
+/**
  * @route GET /health
  * @description Health check endpoint
  */
@@ -40,6 +61,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'ai-content-microservice',
+    message: 'Service is running',
     timestamp: new Date().toISOString(),
     model: 'gpt-4-turbo-preview',
   });
