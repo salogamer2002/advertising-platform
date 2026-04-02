@@ -82,6 +82,22 @@ app.use((req, res, next) => {
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    api: 'Campaign Management API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      docs: '/api-docs',
+      auth: '/auth',
+      campaigns: '/campaigns',
+      clients: '/clients',
+      notifications: '/notifications'
+    }
+  });
+});
+
 // Routes
 app.use('/auth', authRoutes);
 app.use('/campaigns', campaignRoutes);
@@ -90,7 +106,7 @@ app.use('/notifications', notificationRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
 // Error handling middleware
