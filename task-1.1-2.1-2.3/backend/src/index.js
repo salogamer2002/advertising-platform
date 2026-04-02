@@ -19,6 +19,9 @@ dotenv.config();
 const app = express();
 const server = createServer(app);
 
+// Trust proxy (required for Vercel and rate limiting)
+app.set('trust proxy', 1);
+
 // Setup WebSocket
 setupWebSocket(server);
 

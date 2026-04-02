@@ -57,17 +57,21 @@ After deployment, go to your project:
 
 Click on `advertising-api` → Settings → Environment Variables
 
-Add these:
+Add these environment variables **exactly** as shown:
 
-| Name | Value |
+| **Key Name** | **Value** |
 |------|-------|
-| `DATABASE_URL` | (leave empty for mock DB) |
+| `DATABASE_URL` | *(leave empty - just click Save without entering anything)* |
 | `JWT_SECRET` | `super-secret-key-2024-advertising-platform-!@#$%` |
 | `NODE_ENV` | `production` |
 | `USE_MOCK_DB` | `true` |
 | `PORT` | `4000` |
 
-Click "Save"
+**How to enter each one:**
+- For each row, enter the **Key Name** in the left field and the **Value** in the right field
+- Example: Key = `JWT_SECRET` | Value = `super-secret-key-2024-advertising-platform-!@#$%`
+- After entering each variable, click the "+" button to add the next one
+- Click "Save" when all 5 are entered
 
 ### 2c - Redeploy
 
@@ -93,15 +97,15 @@ Go to Deployments → Click latest → "Redeploy" button
 
 After deployment, go to project Settings → Environment Variables
 
-Add these:
+Add these environment variables **exactly** as shown:
 
-| Name | Value |
+| **Key Name** | **Value** |
 |------|-------|
 | `NODE_ENV` | `production` |
 | `USE_MOCK_AI` | `true` |
 | `PORT` | `5000` |
 
-Click "Save" → "Redeploy"
+**How to enter:** For each row, enter the **Key Name** in the left field and the **Value** in the right field. Click the "+" button after each one. Then click "Save" → "Redeploy"
 
 **🎉 Your Microservice URL:** `https://advertising-microservice.salogamer2002.vercel.app`
 
@@ -123,11 +127,13 @@ Click "Save" → "Redeploy"
 
 After deployment, Settings → Environment Variables
 
-Add this:
+Add this environment variable:
 
-| Name | Value |
+| **Key Name** | **Value** |
 |------|-------|
 | `VITE_API_URL` | `https://advertising-api.salogamer2002.vercel.app` |
+
+**How to enter:** Key = `VITE_API_URL` | Value = `https://advertising-api.salogamer2002.vercel.app`
 
 Click "Save" → "Redeploy"
 
@@ -151,11 +157,13 @@ Click "Save" → "Redeploy"
 
 After deployment, Settings → Environment Variables
 
-Add this:
+Add this environment variable:
 
-| Name | Value |
+| **Key Name** | **Value** |
 |------|-------|
 | `VITE_AI_URL` | `https://advertising-microservice.salogamer2002.vercel.app` |
+
+**How to enter:** Key = `VITE_AI_URL` | Value = `https://advertising-microservice.salogamer2002.vercel.app`
 
 Click "Save" → "Redeploy"
 
