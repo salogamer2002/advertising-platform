@@ -76,8 +76,7 @@ app.use(cors({
 app.use(express.json());
 
 // API Documentation - Setup BEFORE rate limiting
-app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Request logging with unique IDs
 app.use((req, res, next) => {
