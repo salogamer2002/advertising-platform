@@ -1,0 +1,130 @@
+export const clients = [
+  { id: "c1", name: "Acme Corp", industry: "Technology" },
+  { id: "c2", name: "Global Retail", industry: "E-commerce" },
+  { id: "c3", name: "FinanceHub", industry: "Finance" },
+  { id: "c4", name: "HealthFirst", industry: "Healthcare" }
+];
+
+export const campaigns = [
+  {
+    id: "camp1",
+    client_id: "c1",
+    client_name: "Acme Corp",
+    name: "Summer Product Launch",
+    status: "active",
+    budget: 50000,
+    spend: 32450,
+    impressions: 2400000,
+    clicks: 48000,
+    conversions: 1920,
+    start_date: "2024-06-01",
+    end_date: "2024-08-31"
+  },
+  {
+    id: "camp2",
+    client_id: "c2",
+    client_name: "Global Retail",
+    name: "Black Friday Campaign",
+    status: "active",
+    budget: 75000,
+    spend: 45200,
+    impressions: 5200000,
+    clicks: 156000,
+    conversions: 4680,
+    start_date: "2024-11-01",
+    end_date: "2024-11-30"
+  },
+  {
+    id: "camp3",
+    client_id: "c3",
+    client_name: "FinanceHub",
+    name: "Q4 Brand Awareness",
+    status: "paused",
+    budget: 30000,
+    spend: 18750,
+    impressions: 1850000,
+    clicks: 27750,
+    conversions: 555,
+    start_date: "2024-10-01",
+    end_date: "2024-12-31"
+  },
+  {
+    id: "camp4",
+    client_id: "c1",
+    client_name: "Acme Corp",
+    name: "Holiday Special",
+    status: "completed",
+    budget: 25000,
+    spend: 24800,
+    impressions: 1200000,
+    clicks: 36000,
+    conversions: 1080,
+    start_date: "2023-12-01",
+    end_date: "2023-12-31"
+  },
+  {
+    id: "camp5",
+    client_id: "c4",
+    client_name: "HealthFirst",
+    name: "Wellness Initiative",
+    status: "active",
+    budget: 40000,
+    spend: 12500,
+    impressions: 980000,
+    clicks: 24500,
+    conversions: 735,
+    start_date: "2024-09-01",
+    end_date: "2024-12-31"
+  },
+  {
+    id: "camp6",
+    client_id: "c2",
+    client_name: "Global Retail",
+    name: "Spring Collection",
+    status: "draft",
+    budget: 35000,
+    spend: 0,
+    impressions: 0,
+    clicks: 0,
+    conversions: 0,
+    start_date: "2025-03-01",
+    end_date: "2025-05-31"
+  }
+];
+
+export const metrics = [
+  { date: "2024-07-01", impressions: 75000, clicks: 1500, conversions: 60, spend: 1050 },
+  { date: "2024-07-02", impressions: 82000, clicks: 1640, conversions: 66, spend: 1148 },
+  { date: "2024-07-03", impressions: 79000, clicks: 1580, conversions: 63, spend: 1106 },
+  { date: "2024-07-04", impressions: 65000, clicks: 1300, conversions: 52, spend: 910 },
+  { date: "2024-07-05", impressions: 71000, clicks: 1420, conversions: 57, spend: 994 },
+  { date: "2024-07-06", impressions: 88000, clicks: 1760, conversions: 70, spend: 1232 },
+  { date: "2024-07-07", impressions: 92000, clicks: 1840, conversions: 74, spend: 1288 },
+  { date: "2024-07-08", impressions: 85000, clicks: 1700, conversions: 68, spend: 1190 },
+  { date: "2024-07-09", impressions: 78000, clicks: 1560, conversions: 62, spend: 1092 },
+  { date: "2024-07-10", impressions: 81000, clicks: 1620, conversions: 65, spend: 1134 },
+  { date: "2024-07-11", impressions: 95000, clicks: 1900, conversions: 76, spend: 1330 },
+  { date: "2024-07-12", impressions: 98000, clicks: 1960, conversions: 78, spend: 1372 },
+  { date: "2024-07-13", impressions: 102000, clicks: 2040, conversions: 82, spend: 1428 },
+  { date: "2024-07-14", impressions: 89000, clicks: 1780, conversions: 71, spend: 1246 },
+  { date: "2024-07-15", impressions: 84000, clicks: 1680, conversions: 67, spend: 1176 },
+  { date: "2024-07-16", impressions: 91000, clicks: 1820, conversions: 73, spend: 1274 },
+  { date: "2024-07-17", impressions: 87000, clicks: 1740, conversions: 70, spend: 1218 },
+  { date: "2024-07-18", impressions: 93000, clicks: 1860, conversions: 74, spend: 1302 },
+  { date: "2024-07-19", impressions: 99000, clicks: 1980, conversions: 79, spend: 1386 },
+  { date: "2024-07-20", impressions: 105000, clicks: 2100, conversions: 84, spend: 1470 },
+  { date: "2024-07-21", impressions: 96000, clicks: 1920, conversions: 77, spend: 1344 },
+  { date: "2024-07-22", impressions: 88000, clicks: 1760, conversions: 70, spend: 1232 },
+  { date: "2024-07-23", impressions: 82000, clicks: 1640, conversions: 66, spend: 1148 },
+  { date: "2024-07-24", impressions: 79000, clicks: 1580, conversions: 63, spend: 1106 },
+  { date: "2024-07-25", impressions: 86000, clicks: 1720, conversions: 69, spend: 1204 },
+  { date: "2024-07-26", impressions: 94000, clicks: 1880, conversions: 75, spend: 1316 },
+  { date: "2024-07-27", impressions: 101000, clicks: 2020, conversions: 81, spend: 1414 },
+  { date: "2024-07-28", impressions: 97000, clicks: 1940, conversions: 78, spend: 1358 },
+  { date: "2024-07-29", impressions: 90000, clicks: 1800, conversions: 72, spend: 1260 },
+  { date: "2024-07-30", impressions: 85000, clicks: 1700, conversions: 68, spend: 1190 }
+];
+
+export type Campaign = typeof campaigns[number];
+export type Client = typeof clients[number];
+export type Metric = typeof metrics[number];

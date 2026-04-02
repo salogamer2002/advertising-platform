@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  ai-content-service:
+    build: .
+    ports:
+      - "3003:3003"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PORT=3003
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

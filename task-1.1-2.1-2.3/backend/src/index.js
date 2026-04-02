@@ -1,0 +1,113 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { createServer } from 'http';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import dotenv from 'dotenv';
+import { v4 as uuidv4 } from 'uuid';
+
+import authRoutes from './routes/auth.js';
+import campaignRoutes from './routes/campaigns.js';
+import clientRoutes from './routes/clients.js';
+import notificationRoutes from './routes/notifications.js';
+import { setupWebSocket } from './websocket/index.js';
+
+dotenv.config();
+
+const app = express();
+const server = createServer(app);
+
+// Setup WebSocket
+setupWebSocket(server);
+
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Campaign Management API',
+      version: '1.0.0',
+      description: 'RESTful API for managing advertising campaigns',
+    },
+    servers: [{ url: `http://localhost:${process.env.PORT || 3001}` }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+  },
+  apis: ['./src/routes/*.js'],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// Middleware
+app.use(helmet());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+}));
+app.use(express.json());
+
+// Rate limiting: 100 requests per IP per minute
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests', message: 'Please try again later' },
+});
+app.use(limiter);
+
+// Request logging with unique IDs
+app.use((req, res, next) => {
+  req.requestId = uuidv4();
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[${req.requestId}] ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+  });
+  
+  next();
+});
+
+// API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Routes
+app.use('/auth', authRoutes);
+app.use('/campaigns', campaignRoutes);
+app.use('/clients', clientRoutes);
+app.use('/notifications', notificationRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(`[${req.requestId}] Error:`, err);
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    requestId: req.requestId 
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found', message: 'Endpoint not found' });
+});
+
+const PORT = process.env.PORT || 3001;
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
+  console.log(`WebSocket: ws://localhost:${PORT}/ws`);
+});
