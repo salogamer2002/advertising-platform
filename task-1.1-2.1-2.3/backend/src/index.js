@@ -56,9 +56,9 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
+      styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
-      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      fontSrc: ["'self'"],
       imgSrc: ["'self'", 'data:', 'https:'],
     },
   },
@@ -68,14 +68,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
-app.use(express.static('node_modules/swagger-ui-express/swagger-ui-dist'));
 
-// API Documentation SETUP - Swagger UI with proper static file serving
-app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
-  swaggerUrl: '/swagger.json',
-  customCss: '.swagger-ui { margin: 0; padding: 0; }',
-}));
+// API Documentation - Swagger UI handles all static assets
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Request logging with unique IDs
 app.use((req, res, next) => {
@@ -95,7 +90,7 @@ const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
   message: { error: 'Too many requests', message: 'Please try again later' },
-  skip: (req) => req.path.startsWith('/api-docs') || req.path === '/swagger.json',
+  skip: (req) => req.path.startsWith('/api-docs'),
 });
 app.use(limiter);
 
@@ -107,19 +102,12 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       docs: '/api-docs',
-      swagger: '/swagger.json',
       auth: '/auth',
       campaigns: '/campaigns',
       clients: '/clients',
       notifications: '/notifications'
     }
   });
-});
-
-// Swagger JSON endpoint
-app.get('/swagger.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerSpec);
 });
 
 // Routes
