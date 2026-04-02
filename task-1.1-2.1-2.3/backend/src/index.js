@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -56,10 +55,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
+      scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
       fontSrc: ["'self'"],
       imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'"],
     },
   },
 }));
@@ -69,8 +69,58 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// API Documentation - Swagger UI handles all static assets
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Swagger JSON endpoint
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+// API Documentation - Custom HTML with CDN-based Swagger UI (works on Vercel)
+app.get('/api-docs', (req, res) => {
+  const swaggerUiAssetPath = '/api-docs-assets';
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>API Docs - Campaign Management API</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css">
+      <style>
+        html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body { margin: 0; background: #fafafa; }
+      </style>
+    </head>
+    <body>
+      <div id="swagger-ui"></div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js"></script>
+      <script>
+        window.onload = function() {
+          const ui = SwaggerUIBundle({
+            url: "/swagger.json",
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            plugins: [
+              SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+          });
+          window.ui = ui;
+        }
+      </script>
+    </body>
+    </html>
+  `;
+  res.setHeader('Content-Type', 'text/html');
+  res.send(html);
+});
 
 // Request logging with unique IDs
 app.use((req, res, next) => {
@@ -90,7 +140,7 @@ const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
   message: { error: 'Too many requests', message: 'Please try again later' },
-  skip: (req) => req.path.startsWith('/api-docs'),
+  skip: (req) => req.path === '/api-docs' || req.path === '/swagger.json',
 });
 app.use(limiter);
 
