@@ -2,6 +2,8 @@ import { useState } from 'react';
 import MultiStepForm from './components/MultiStepForm';
 import AIOutput from './components/AIOutput';
 
+const AI_SERVICE_URL = import.meta.env.VITE_AI_URL || 'http://localhost:5000';
+
 export default function App() {
   const [briefData, setBriefData] = useState(null);
   const [aiResult, setAiResult] = useState(null);
@@ -13,7 +15,7 @@ export default function App() {
 
     try {
       // Call the real AI microservice
-      const response = await fetch('http://localhost:5000/generate/copy', {
+      const response = await fetch(`${AI_SERVICE_URL}/generate/copy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
