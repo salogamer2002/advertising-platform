@@ -26,6 +26,13 @@ app.set('trust proxy', 1);
 setupWebSocket(server);
 
 // Swagger configuration
+const getServerUrl = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://advertising-api.salogamer2002.vercel.app';
+  }
+  return `http://localhost:${process.env.PORT || 3001}`;
+};
+
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -34,7 +41,7 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'RESTful API for managing advertising campaigns',
     },
-    servers: [{ url: `http://localhost:${process.env.PORT || 3001}` }],
+    servers: [{ url: getServerUrl() }],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -51,7 +58,17 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:', 'https:'],
+    },
+  },
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
