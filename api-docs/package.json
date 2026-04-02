@@ -1,0 +1,8 @@
+{
+  "name": "campaign-api-docs",
+  "version": "1.0.0",
+  "description": "Campaign Management API Documentation",
+  "scripts": {
+    "start": "npx http-server . -p 3000"
+  }
+}

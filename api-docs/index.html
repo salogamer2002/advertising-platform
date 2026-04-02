@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campaign Management API - Documentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { background: white; padding: 40px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+    .header h1 { color: #667eea; margin-bottom: 10px; font-size: 32px; }
+    .header p { color: #666; font-size: 16px; margin-bottom: 5px; }
+    .header .version { color: #999; font-size: 14px; }
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+    @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+    .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+    .card h2 { color: #667eea; margin-bottom: 20px; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+    .card h2:before { font-size: 24px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px; }
+    input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: monospace; }
+    input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; }
+    button:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3); }
+    .endpoints { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+    .endpoints h2 { color: #667eea; margin-bottom: 25px; font-size: 20px; }
+    .endpoint { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #f0f0f0; }
+    .endpoint:last-child { border-bottom: none; }
+    .endpoint-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+    .method { display: inline-block; padding: 6px 16px; border-radius: 6px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .get { background: #e3f2fd; color: #1976d2; }
+    .post { background: #e8f5e9; color: #388e3c; }
+    .put { background: #fff3e0; color: #f57c00; }
+    .delete { background: #ffebee; color: #d32f2f; }
+    .path { font-family: "Courier New", monospace; color: #333; font-size: 14px; font-weight: 600; }
+    .description { color: #666; margin-bottom: 10px; font-size: 14px; line-height: 1.5; }
+    .code-block { background: #f5f5f5; padding: 15px; border-left: 3px solid #667eea; margin: 12px 0; font-family: "Courier New", monospace; font-size: 12px; overflow-x: auto; border-radius: 6px; }
+    .status { padding: 15px; background: #e8f5e9; border-left: 4px solid #4caf50; margin: 12px 0; border-radius: 6px; font-size: 13px; color: #2e7d32; }
+    .status.error { background: #ffebee; border-left-color: #f44336; color: #c62828; }
+    .copy-btn { background: #f0f0f0; color: #667eea; padding: 6px 12px; font-size: 12px; margin-left: 10px; }
+    .copy-btn:hover { background: #e0e0e0; }
+    .success-msg { color: #4caf50; font-size: 13px; margin-top: 8px; }
+    .auth-output { background: #f5f5f5; padding: 12px; border-radius: 6px; margin-top: 10px; font-family: monospace; font-size: 12px; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📋 Campaign Management API</h1>
+      <p>Complete REST API for managing advertising campaigns, clients, and notifications</p>
+      <div class="version">
+        <strong>Version:</strong> 1.0.0 | 
+        <strong>Base URL:</strong> <code>https://advertising-api.vercel.app</code> |
+        <strong>Status:</strong> ✅ Live
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="card">
+        <h2>🔐 Authorization</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">All endpoints require JWT Bearer token authentication</p>
+        <div class="form-group">
+          <label for="authToken">JWT Token:</label>
+          <input type="password" id="authToken" placeholder="Enter your token" value="super-secret-key-2024-advertising-platform-!@#$%">
+        </div>
+        <button onclick="copyAuthHeader()">📋 Copy Auth Header</button>
+        <div id="authOutput"></div>
+      </div>
+
+      <div class="card">
+        <h2>🚀 Quick Test</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Test the API with a simple request</p>
+        <button onclick="testHealth()" style="width: 100%; margin-bottom: 10px;">Test Health Endpoint</button>
+        <div id="testOutput"></div>
+      </div>
+    </div>
+
+    <div class="endpoints">
+      <h2>📡 Available Endpoints</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/</span>
+        </div>
+        <div class="description">Get API information and available endpoints</div>
+        <div class="code-block">curl https://advertising-api.vercel.app/</div>
+        <div class="status">200 OK - Returns API metadata</div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/health</span>
+        </div>
+        <div class="description">Health check - verify server is running</div>
+        <div class="code-block">curl https://advertising-api.vercel.app/health</div>
+        <div class="status">200 OK - Server is healthy</div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/swagger.json</span>
+        </div>
+        <div class="description">Get OpenAPI 3.0 specification</div>
+        <div class="code-block">curl https://advertising-api.vercel.app/swagger.json</div>
+        <div class="status">200 OK - Returns OpenAPI spec</div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/auth/login</span>
+        </div>
+        <div class="description">Authenticate and get JWT token</div>
+        <div class="code-block">curl -X POST https://advertising-api.vercel.app/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"password"}'</div>
+        <div class="status">200 OK - Returns JWT token</div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/campaigns</span>
+        </div>
+        <div class="description">List all advertising campaigns</div>
+        <div class="code-block">curl https://advertising-api.vercel.app/campaigns \
+  -H "Authorization: Bearer YOUR_TOKEN"</div>
+        <div class="status">200 OK - Returns campaigns array</div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/campaigns</span>
+        </div>
+        <div class="description">Create new campaign</div>
+        <div class="code-block">curl -X POST https://advertising-api.vercel.app/campaigns \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Q4 Campaign","status":"active"}'</div>
+        <div class="status">201 Created</div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/clients</span>
+        </div>
+        <div class="description">List all clients</div>
+        <div class="code-block">curl https://advertising-api.vercel.app/clients \
+  -H "Authorization: Bearer YOUR_TOKEN"</div>
+        <div class="status">200 OK - Returns clients array</div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/notifications</span>
+        </div>
+        <div class="description">Get real-time notifications</div>
+        <div class="code-block">curl https://advertising-api.vercel.app/notifications \
+  -H "Authorization: Bearer YOUR_TOKEN"</div>
+        <div class="status">200 OK - Returns notifications</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function copyAuthHeader() {
+      const token = document.getElementById('authToken').value;
+      const header = `Authorization: Bearer ${token}`;
+      navigator.clipboard.writeText(header).then(() => {
+        const output = document.getElementById('authOutput');
+        output.innerHTML = `<div class="auth-output">✅ Copied: ${header}</div>`;
+        setTimeout(() => { output.innerHTML = ''; }, 3000);
+      });
+    }
+
+    function testHealth() {
+      const output = document.getElementById('testOutput');
+      output.innerHTML = '<div style="color: #667eea;">Testing...</div>';
+      
+      fetch('https://advertising-api.vercel.app/health')
+        .then(r => r.json())
+        .then(data => {
+          output.innerHTML = `<div class="status">✅ ${data.status}: ${data.message}</div>`;
+        })
+        .catch(e => {
+          output.innerHTML = `<div class="status error">❌ Error: ${e.message}</div>`;
+        });
+    }
+  </script>
+</body>
+</html>
