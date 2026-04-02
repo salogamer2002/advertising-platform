@@ -5,7 +5,7 @@ import CampaignTable from '../components/CampaignTable';
 import DateRangePicker from '../components/DateRangePicker';
 import mockData from '../data/mockData.json';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState({ type: 'preset', days: 30 });
