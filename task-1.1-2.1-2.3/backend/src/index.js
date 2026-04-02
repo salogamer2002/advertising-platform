@@ -5,6 +5,8 @@ import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,6 +20,9 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
+
+// Get __dirname in ES modules
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Trust proxy (required for Vercel and rate limiting)
 app.set('trust proxy', 1);
@@ -95,6 +100,18 @@ app.use((req, res, next) => {
   
   next();
 });
+
+// Serve Swagger UI static files with proper MIME types
+const swaggerPath = path.resolve(__dirname, '../node_modules/swagger-ui-express/static');
+app.use('/api-docs', express.static(swaggerPath, {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
 
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
