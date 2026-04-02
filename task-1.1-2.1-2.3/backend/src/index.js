@@ -22,7 +22,7 @@ app.set('trust proxy', 1);
 // Swagger configuration
 const getServerUrl = () => {
   if (process.env.NODE_ENV === 'production') {
-    return 'https://advertising-api.salogamer2002.vercel.app';
+    return 'https://advertising-api.vercel.app';
   }
   return `http://localhost:${process.env.PORT || 3001}`;
 };
@@ -56,9 +56,9 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
       scriptSrc: ["'self'", "'unsafe-inline'"],
-      fontSrc: ["'self'"],
+      fontSrc: ["'self'", 'fonts.gstatic.com'],
       imgSrc: ["'self'", 'data:', 'https:'],
     },
   },
@@ -68,9 +68,14 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(express.static('node_modules/swagger-ui-express/swagger-ui-dist'));
 
-// API Documentation - Setup BEFORE rate limiting
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// API Documentation SETUP - Swagger UI with proper static file serving
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
+  swaggerUrl: '/swagger.json',
+  customCss: '.swagger-ui { margin: 0; padding: 0; }',
+}));
 
 // Request logging with unique IDs
 app.use((req, res, next) => {
@@ -90,7 +95,7 @@ const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
   message: { error: 'Too many requests', message: 'Please try again later' },
-  skip: (req) => req.path.startsWith('/api-docs'), // Skip rate limiting for Swagger UI
+  skip: (req) => req.path.startsWith('/api-docs') || req.path === '/swagger.json',
 });
 app.use(limiter);
 
@@ -102,12 +107,19 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       docs: '/api-docs',
+      swagger: '/swagger.json',
       auth: '/auth',
       campaigns: '/campaigns',
       clients: '/clients',
       notifications: '/notifications'
     }
   });
+});
+
+// Swagger JSON endpoint
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
 });
 
 // Routes
