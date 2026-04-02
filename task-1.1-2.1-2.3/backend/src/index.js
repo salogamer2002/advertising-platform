@@ -5,8 +5,6 @@ import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,9 +18,6 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
-
-// Get __dirname in ES modules
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Trust proxy (required for Vercel and rate limiting)
 app.set('trust proxy', 1);
@@ -67,9 +62,9 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
+      styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
-      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      fontSrc: ["'self'"],
       imgSrc: ["'self'", 'data:', 'https:'],
     },
   },
@@ -80,20 +75,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Serve Swagger UI BEFORE rate limiting
-const swaggerPath = path.resolve(__dirname, '../node_modules/swagger-ui-express/static');
-app.use('/api-docs', express.static(swaggerPath, {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    } else if (filePath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    }
-  }
-}));
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// API Documentation - Setup BEFORE rate limiting
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec));
 
-// Request logging with unique IDs (BEFORE rate limiting)
+// Request logging with unique IDs
 app.use((req, res, next) => {
   req.requestId = uuidv4();
   const start = Date.now();
@@ -106,7 +92,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Rate limiting: 100 requests per IP per minute (AFTER Swagger UI & logging)
+// Rate limiting: 100 requests per IP per minute (AFTER Swagger UI)
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
