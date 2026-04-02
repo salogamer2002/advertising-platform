@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { createServer } from 'http';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
@@ -12,18 +11,13 @@ import authRoutes from './routes/auth.js';
 import campaignRoutes from './routes/campaigns.js';
 import clientRoutes from './routes/clients.js';
 import notificationRoutes from './routes/notifications.js';
-import { setupWebSocket } from './websocket/index.js';
 
 dotenv.config();
 
 const app = express();
-const server = createServer(app);
 
 // Trust proxy (required for Vercel and rate limiting)
 app.set('trust proxy', 1);
-
-// Setup WebSocket
-setupWebSocket(server);
 
 // Swagger configuration
 const getServerUrl = () => {
@@ -143,8 +137,9 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
-  console.log(`WebSocket: ws://localhost:${PORT}/ws`);
 });
+
+export default app;
