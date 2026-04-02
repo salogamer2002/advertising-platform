@@ -62,7 +62,7 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-// Middleware
+// Middleware - Order matters!
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -80,15 +80,20 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Rate limiting: 100 requests per IP per minute
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 100,
-  message: { error: 'Too many requests', message: 'Please try again later' },
-});
-app.use(limiter);
+// Serve Swagger UI BEFORE rate limiting
+const swaggerPath = path.resolve(__dirname, '../node_modules/swagger-ui-express/static');
+app.use('/api-docs', express.static(swaggerPath, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Request logging with unique IDs
+// Request logging with unique IDs (BEFORE rate limiting)
 app.use((req, res, next) => {
   req.requestId = uuidv4();
   const start = Date.now();
@@ -101,20 +106,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve Swagger UI static files with proper MIME types
-const swaggerPath = path.resolve(__dirname, '../node_modules/swagger-ui-express/static');
-app.use('/api-docs', express.static(swaggerPath, {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    } else if (path.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    }
-  }
-}));
-
-// API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Rate limiting: 100 requests per IP per minute (AFTER Swagger UI & logging)
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests', message: 'Please try again later' },
+  skip: (req) => req.path.startsWith('/api-docs'), // Skip rate limiting for Swagger UI
+});
+app.use(limiter);
 
 // Root endpoint
 app.get('/', (req, res) => {
